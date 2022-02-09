@@ -1,0 +1,20 @@
+# module 2 menu.py
+from tkinter import *
+def menu():
+    root2 = Tk()
+    root2.geometry("400x600+100+50")
+    root2.configure(background="gray27")
+    root2.title("Menu")
+    label_fries = Label(root2, text="Fries\t:\t50 Rs/-", font=("Segoe-ui", 15))
+    label_fries.place(x=80, y=100)
+    label_lunch = Label(root2, text="Lunch\t:\t49 Rs/-", font=("Segoe-ui", 15))
+    label_lunch.place(x=80, y=150)
+    label_pizza = Label(root2, text="Pizza\t:\t69 Rs/-", font=("Segoe-ui", 15))
+    label_pizza.place(x=80, y=200)
+    label_burger = Label(root2, text="Burger\t:\t30 Rs/-", font=("Segoe-ui", 15))
+    label_burger.place(x=80, y=250)
+    label_cheeze = Label(root2, text="CBurger\t:\t35 Rs/-", font=("Segoe-ui", 15))
+    label_cheeze.place(x=80, y=300)
+    label_drinks = Label(root2, text="Drinks\t:\t45 Rs/-", font=("Segoe-ui", 15))
+    label_drinks.place(x=80, y=350)
+    root2.mainloop()
