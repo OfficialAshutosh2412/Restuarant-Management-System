@@ -1,6 +1,6 @@
 # tkinter for gui part
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox
 # time for access date and time
 from time import *
 # menu is module 2
@@ -9,6 +9,11 @@ import menu
 import random
 # subprocess for accessing the programs of windows
 import subprocess
+# for database connectivity
+import pymysql
+#datetime module
+import datetime
+from datetime import datetime
 # creation of main gui window
 root = Tk()
 # making window fullscreen
@@ -30,8 +35,9 @@ def reset():
     varBurger.set(0)
     varLunch.set(0)
 
-def recipt(fries, lunch, burger, pizza, cheezeBurger, drinks, varOrder, mealCost, service, tax, tcost):
+def recipt(fries, lunch, burger, pizza, cheezeBurger, drinks, varOrder, mealCost, service, tax, tcost, customer_name):
     bill = "-----------------------------------Your Bill----------------------------------"
+    name = "Customer Name:\t"+customer_name
     fr = "Fries\t:\t"+str(fries)+" Rs/-"
     lnch = "Lunch\t:\t"+str(lunch)+ "Rs/-"
     pb = "Plane-Burger :\t"+str(burger)+" Rs/-"
@@ -67,13 +73,18 @@ def recipt(fries, lunch, burger, pizza, cheezeBurger, drinks, varOrder, mealCost
     l11.place(x=0, y=300)
     l12 = Label(bill_frame, text=tc, font=(8), bg="white")
     l12.place(x=0, y=330)
+    l13 = Label(bill_frame, text=name, font=(8), bg="white")
+    l13.place(x=0, y=350)
     
 def calc():
     # accessing the calculator of windows
     subprocess.Popen("C:\\Windows\\System32\\calc.exe")
 
 def total():
+    timing = strftime("%d-%B-%Y\t%H:%M:%S  %p")
+
     # getting values of entry boxes
+    customer_name = cname.get()
     fries = varFries.get()
     lunch = varLunch.get()
     burger = varBurger.get()
@@ -107,8 +118,27 @@ def total():
     total_cost_pay = total_cost_of_meal + service + tax
     tcost = str(total_cost_pay)
     varTotal.set(tcost)
+    # database connectivity
+    try:
+        # establish connectivity to the database
+        con = pymysql.connect(
+        user = "root",
+        password = "",
+        host = "localhost",
+        database = "rms"
+        )
+        cur = con.cursor()
+        cur.execute("INSERT INTO customer_meal(customername,fmeal,lmeal,pbmeal,pizzameal,cheezemeal,drinkmeal,orderno,costofmeal,surcharge,taxcharge,totalpay,timed_ate) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(
+            customer_name,fries,lunch,burger,pizza,cheezeBurger,drinks,randomRef,y,a,b,tcost,timing
+        ))
+        con.commit()
+        con.close()
+        messagebox.showinfo("information", "Data Added Successfully!", parent=leftFrame)
+
+    except Exception as es:
+        messagebox.showerror("error", f"error due to:- {es}", parent=leftFrame)
     # calling recipt function 
-    recipt(fries, lunch, burger, pizza, cheezeBurger, drinks, randomRef, total_cost_of_meal, service, tax, tcost)
+    recipt(fries, lunch, burger, pizza, cheezeBurger, drinks, randomRef, total_cost_of_meal, service, tax, tcost,customer_name)
 
 #------------------------variables----------------------------
 varFries = IntVar()
@@ -122,6 +152,7 @@ varCheeze = IntVar()
 varPizza = IntVar()
 varBurger = IntVar()
 varLunch = IntVar()
+cname = StringVar()
 # -----frames-------------
 leftFrame = Frame(root, width=570, height=768, bg="grey20").pack(side=LEFT)
 rightFrame = Frame(root, width=800, height=768, bg="grey30").pack(side=RIGHT)
@@ -194,6 +225,11 @@ totalLabel = Label(rightFrame, text="Total Cost", font=("segoe-ui", 15), bg="gre
 totalLabel.place(x=700, y=650)
 totalEntry = ttk.Entry(rightFrame, width=30, font=("segoe-ui", 15, "bold", "italic"), textvariable=varTotal)
 totalEntry.place(x=900, y=650)
+#------------Name---------------------------------
+nameLabel = Label(rightFrame, text="Your Name", font=("segoe-ui", 15), bg="grey30", fg="white")
+nameLabel.place(x=700, y=700)
+nameEntry = ttk.Entry(rightFrame, width=30, font=("segoe-ui", 15, "bold", "italic"), textvariable=cname)
+nameEntry.place(x=900, y=700)
 # -----------------Buttons------------------------
 menuButton = Button(leftFrame, text="Menu", width=20, height=2, font=('segoe-ui', 13),bd=0, bg="cyan3", command=menu.menu)
 menuButton.place(x=60, y=500)
